@@ -285,10 +285,12 @@
         .half-sello .half-label     { left: 0; right: 0; padding: 30vh 8vw 0; }
     }
 
-    /* en tactil no hay hover: se muestran los dos rotulos siempre */
+    /* En tactil no hay hover, asi que los dos titulos quedan a la vista. La
+       bajada y el boton NO: si se encienden, se prenden los de las dos mitades
+       al mismo tiempo y la portada queda tapada de texto. Tocar la mitad ya
+       navega a su seccion, que es todo lo que hace falta. */
     @media (hover: none) {
         .half-label h2 { opacity: 1; transform: none; }
-        .half-label p, .half-label .entrar { opacity: 1; transform: none; }
         .half-bg { filter: grayscale(0) brightness(0.55) contrast(1.05); }
     }
 
