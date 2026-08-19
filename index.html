@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reina Prisma — Plan B: portada dividida</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800;900&family=Bagel+Fat+One&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --bg: #140a09;
+        --text: #f3e7dd;
+        --text-muted: #b39a8c;
+        --accent: #e0673b;
+        --ink: #0c0605;
+        /* La hairline de todo el sitio. Estaba usada en cada borde pero nunca
+           definida, asi que los marcos, la grilla del roster y el cuadro de
+           Spotify se dibujaban en la nada. */
+        --line: rgba(243, 231, 221, 0.14);
+
+        /* La diagonal. Cada estado define los mismos 4 vertices para que
+           clip-path pueda interpolar entre ellos. */
+        --linea: 2px;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    html, body {
+        height: 100%;
+        background: var(--ink);
+        color: var(--text);
+        font-family: 'Archivo', sans-serif;
+        -webkit-font-smoothing: antialiased;
+    }
+
+    .split {
+        position: relative;
+        width: 100%;
+        height: 100svh;
+        min-height: 520px;
+        overflow: hidden;
+        background: var(--ink);
+    }
+
+    /* ---------- las dos mitades ---------- */
+    .half {
+        position: absolute;
+        inset: 0;
+        display: block;
+        text-decoration: none;
+        color: inherit;
+        overflow: hidden;
+        transition: clip-path 0.75s cubic-bezier(.22,.61,.36,1);
+        will-change: clip-path;
+    }
+    .half-servicios { clip-path: polygon(0 0, 62% 0, 38% 100%, 0 100%); }
+    .half-sello     { clip-path: polygon(62% 0, 100% 0, 100% 100%, 38% 100%); }
+
+    /* al pasar por una, la diagonal se corre y le cede espacio */
+    .split[data-hover="servicios"] .half-servicios { clip-path: polygon(0 0, 78% 0, 54% 100%, 0 100%); }
+    .split[data-hover="servicios"] .half-sello     { clip-path: polygon(78% 0, 100% 0, 100% 100%, 54% 100%); }
+    .split[data-hover="sello"]     .half-servicios { clip-path: polygon(0 0, 46% 0, 22% 100%, 0 100%); }
+    .split[data-hover="sello"]     .half-sello     { clip-path: polygon(46% 0, 100% 0, 100% 100%, 22% 100%); }
+
+    /* ---------- la imagen de fondo de cada mitad ---------- */
+    .half-bg {
+        position: absolute;
+        inset: -4%;                     /* margen extra para que el zoom no muestre bordes */
+        background-size: cover;
+        background-position: center;
+        filter: grayscale(1) brightness(0.52) contrast(1.05);
+        transform: scale(1);
+        transition: filter 0.6s ease, transform 1.1s cubic-bezier(.22,.61,.36,1);
+        will-change: transform, filter;
+    }
+    .half-servicios .half-bg { background-image: url('assets/main4.jpg'); }
+    .half-sello .half-bg     { background-image: url('assets/hero-014.jpg'); }
+
+    .split[data-hover="servicios"] .half-servicios .half-bg,
+    .split[data-hover="sello"] .half-sello .half-bg {
+        filter: grayscale(0) brightness(0.72) contrast(1.05);
+        transform: scale(1.06);
+    }
+    /* la mitad no elegida se apaga un poco mas */
+    .split[data-hover="servicios"] .half-sello .half-bg,
+    .split[data-hover="sello"] .half-servicios .half-bg {
+        filter: grayscale(1) brightness(0.26) contrast(1.05);
+    }
+
+    /* El video vive DENTRO de .half-bg a proposito: asi hereda el filtro de
+       gris a color y queda debajo de la viñeta, igual que la foto. */
+    .half-video {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        pointer-events: none;
+        transition: opacity 0.8s ease;
+    }
+    .split[data-hover="servicios"] .half-servicios .half-video,
+    .split[data-hover="sello"] .half-sello .half-video { opacity: 1; }
+
+    @media (hover: none), (prefers-reduced-motion: reduce) {
+        .half-video { display: none; }
+    }
+
+    /* viñeta para que el texto siempre se lea */
+    .half-bg::after {
+        content: '';
+        position: absolute;
+        inset: 0;
+        background: radial-gradient(120% 90% at 50% 55%, rgba(12,6,5,0) 30%, rgba(12,6,5,0.72) 100%);
+    }
+
+    /* ---------- el rotulo de cada mitad ---------- */
+    .half-label {
+        position: absolute;
+        top: 0; bottom: 0;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        gap: 14px;
+        transition: left 0.75s cubic-bezier(.22,.61,.36,1), right 0.75s cubic-bezier(.22,.61,.36,1);
+    }
+    /* Cada rotulo se acota a su propia mitad. Si ocupara todo el ancho, los
+       dos se centrarian en el mismo punto y se superpondrian. */
+    .half-servicios .half-label { left: 3vw; right: 54%; }
+    .half-sello .half-label     { left: 54%; right: 3vw; }
+
+    .half-label h2 {
+        font-size: clamp(30px, 5vw, 76px);
+        font-weight: 900;
+        letter-spacing: -0.03em;
+        line-height: 0.92;
+        text-transform: uppercase;
+        opacity: 0.58;
+        transform: translateY(10px);
+        transition: opacity 0.5s ease, transform 0.6s cubic-bezier(.22,.61,.36,1);
+    }
+    /* La bajada va en Archivo y no en mono: en versalitas chiquitas sobre una
+       foto no se leia. Cuerpo mas grande, texto pleno y sombra para separarla
+       del fondo. */
+    .half-label p {
+        font-family: 'Archivo', sans-serif;
+        font-size: clamp(16px, 1.6vw, 22px);
+        font-weight: 500;
+        line-height: 1.42;
+        letter-spacing: -0.005em;
+        color: var(--text);
+        text-shadow: 0 2px 20px rgba(12,6,5,0.9), 0 1px 3px rgba(12,6,5,0.7);
+        max-width: 22ch;
+        margin-top: 4px;
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity 0.45s ease 0.06s, transform 0.55s cubic-bezier(.22,.61,.36,1) 0.06s;
+    }
+    /* El llamado a la accion es lo que se tiene que clickear: va como boton
+       solido, no como texto chico en versalitas. */
+    .half-label .entrar {
+        display: inline-flex;
+        align-items: center;
+        gap: 9px;
+        margin-top: 20px;
+        padding: 15px 30px 17px;
+        border-radius: 999px;
+        background: var(--accent);
+        color: var(--ink);
+        font-family: 'Bagel Fat One', 'Archivo', sans-serif;
+        font-size: clamp(15px, 1.35vw, 19px);
+        font-weight: 400;
+        letter-spacing: 0.005em;
+        line-height: 1.05;
+        white-space: nowrap;
+        box-shadow: 0 12px 34px rgba(12,6,5,0.55);
+        opacity: 0;
+        transform: translateY(14px);
+        transition: opacity 0.45s ease 0.12s, transform 0.55s cubic-bezier(.22,.61,.36,1) 0.12s, background 0.25s ease;
+    }
+    .half:hover .half-label .entrar { background: #f07a4d; }
+    .half-label .entrar .flecha { transition: transform 0.35s ease; }
+    .half:hover .half-label .entrar .flecha { transform: translateX(4px); }
+
+    .half-label h2 { text-shadow: 0 4px 30px rgba(12,6,5,0.8); }
+
+    /* Sombra propia detras del bloque de texto: la viñeta general no alcanza
+       cuando la foto tiene zonas claras justo ahi. */
+    .half-label::before {
+        content: '';
+        position: absolute;
+        left: 50%; top: 50%;
+        width: 150%; height: 90%;
+        transform: translate(-50%, -50%);
+        background: radial-gradient(60% 50% at 50% 50%, rgba(12,6,5,0.72) 0%, rgba(12,6,5,0) 72%);
+        opacity: 0;
+        transition: opacity 0.5s ease;
+        pointer-events: none;
+        z-index: -1;
+    }
+    .split[data-hover="servicios"] .half-servicios .half-label::before,
+    .split[data-hover="sello"] .half-sello .half-label::before { opacity: 1; }
+
+    .split[data-hover="servicios"] .half-servicios .half-label h2,
+    .split[data-hover="sello"] .half-sello .half-label h2 {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    .split[data-hover="servicios"] .half-servicios .half-label p,
+    .split[data-hover="servicios"] .half-servicios .half-label .entrar,
+    .split[data-hover="sello"] .half-sello .half-label p,
+    .split[data-hover="sello"] .half-sello .half-label .entrar {
+        opacity: 1;
+        transform: translateY(0);
+    }
+    /* El rotulo apagado se corre hacia su borde: si se queda en el centro de
+       su mitad original, la diagonal lo corta al medio de la palabra. */
+    .split[data-hover="sello"] .half-servicios .half-label { right: 80%; }
+    .split[data-hover="servicios"] .half-sello .half-label { left: 80%; }
+    .split[data-hover="servicios"] .half-sello .half-label h2,
+    .split[data-hover="sello"] .half-servicios .half-label h2 {
+        opacity: 0.28;
+        font-size: clamp(20px, 2.6vw, 38px);
+    }
+
+    /* ---------- la linea diagonal ---------- */
+    .divider {
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: linear-gradient(180deg, rgba(224,103,59,0.9), rgba(243,231,221,0.55));
+        clip-path: polygon(62% 0, calc(62% + var(--linea)) 0, calc(38% + var(--linea)) 100%, 38% 100%);
+        transition: clip-path 0.75s cubic-bezier(.22,.61,.36,1);
+        z-index: 3;
+    }
+    .split[data-hover="servicios"] .divider { clip-path: polygon(78% 0, calc(78% + var(--linea)) 0, calc(54% + var(--linea)) 100%, 54% 100%); }
+    .split[data-hover="sello"] .divider     { clip-path: polygon(46% 0, calc(46% + var(--linea)) 0, calc(22% + var(--linea)) 100%, 22% 100%); }
+
+    /* ---------- logo y pie ---------- */
+    .marca {
+        position: absolute;
+        top: 34px; left: 50%;
+        transform: translateX(-50%);
+        z-index: 4;
+        pointer-events: none;
+    }
+    .marca img { display: block; height: 78px; width: auto; opacity: 0.95; }
+    @media (max-width: 560px) { .marca img { height: 58px; } }
+
+    .pie {
+        position: absolute;
+        bottom: 26px; left: 50%;
+        transform: translateX(-50%);
+        z-index: 4;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10.5px;
+        letter-spacing: 0.2em;
+        text-transform: uppercase;
+        color: rgba(243,231,221,0.42);
+        pointer-events: none;
+        transition: opacity 0.4s ease;
+    }
+    .split[data-hover] .pie { opacity: 0; }
+
+    /* ---------- pantallas angostas: la diagonal pasa a horizontal ---------- */
+    @media (max-width: 820px) {
+        .half-servicios { clip-path: polygon(0 0, 100% 0, 100% 38%, 0 62%); }
+        .half-sello     { clip-path: polygon(0 62%, 100% 38%, 100% 100%, 0 100%); }
+        .split[data-hover="servicios"] .half-servicios { clip-path: polygon(0 0, 100% 0, 100% 54%, 0 78%); }
+        .split[data-hover="servicios"] .half-sello     { clip-path: polygon(0 78%, 100% 54%, 100% 100%, 0 100%); }
+        .split[data-hover="sello"] .half-servicios     { clip-path: polygon(0 0, 100% 0, 100% 22%, 0 46%); }
+        .split[data-hover="sello"] .half-sello         { clip-path: polygon(0 46%, 100% 22%, 100% 100%, 0 100%); }
+
+        .divider { clip-path: polygon(0 62%, 100% 38%, 100% calc(38% + var(--linea)), 0 calc(62% + var(--linea))); }
+        .split[data-hover="servicios"] .divider { clip-path: polygon(0 78%, 100% 54%, 100% calc(54% + var(--linea)), 0 calc(78% + var(--linea))); }
+        .split[data-hover="sello"] .divider     { clip-path: polygon(0 46%, 100% 22%, 100% calc(22% + var(--linea)), 0 calc(46% + var(--linea))); }
+
+        /* en horizontal cada rotulo vuelve a ocupar el ancho completo,
+           y se separan por arriba y por abajo en vez de por los costados */
+        .half-servicios .half-label { left: 0; right: 0; padding: 0 8vw 30vh; }
+        .half-sello .half-label     { left: 0; right: 0; padding: 30vh 8vw 0; }
+    }
+
+    /* en tactil no hay hover: se muestran los dos rotulos siempre */
+    @media (hover: none) {
+        .half-label h2 { opacity: 1; transform: none; }
+        .half-label p, .half-label .entrar { opacity: 1; transform: none; }
+        .half-bg { filter: grayscale(0) brightness(0.55) contrast(1.05); }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .half, .half-bg, .divider, .half-label h2, .half-label p, .half-label .entrar { transition: none; }
+    }
+
+
+    /* ---------- secciones ---------- */
+    .seccion { padding: 110px 6vw 130px; background: var(--bg); border-top: 1px solid var(--line); }
+    .seccion-inner { max-width: 1180px; margin: 0 auto; }
+
+    .cabeza {
+        display: flex; align-items: center; gap: 14px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+        color: var(--text-muted); margin-bottom: 18px;
+    }
+    .cabeza .idx { color: var(--accent); }
+    .cabeza .bar { width: 46px; height: 1px; background: var(--line); }
+
+    .seccion h2 {
+        font-size: clamp(38px, 7vw, 92px);
+        font-weight: 900; letter-spacing: -0.035em; line-height: 0.92;
+        text-transform: uppercase; margin-bottom: 22px;
+    }
+    .entrada { max-width: 60ch; color: var(--text-muted); font-size: clamp(15px, 1.5vw, 18px); line-height: 1.65; }
+    .entrada strong { color: var(--text); font-weight: 600; }
+
+    /* --- el estudio: reservado para las fotos que todavia no existen --- */
+    .estudio { margin-top: 52px; }
+    .estudio-grilla { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; }
+    .hueco {
+        position: relative;
+        border: 1px dashed rgba(243,231,221,0.26);
+        background: rgba(243,231,221,0.03);
+        display: flex; align-items: center; justify-content: center;
+        text-align: center; padding: 18px;
+        min-height: 150px;
+    }
+    .hueco:first-child { grid-row: span 2; min-height: 320px; }
+    .hueco span {
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10.5px; letter-spacing: 0.16em; text-transform: uppercase;
+        color: rgba(243,231,221,0.42); line-height: 1.7;
+    }
+    .estudio-nota {
+        margin-top: 14px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 10.5px; letter-spacing: 0.14em; text-transform: uppercase;
+        color: var(--accent);
+    }
+    @media (max-width: 760px) {
+        .estudio-grilla { grid-template-columns: 1fr 1fr; }
+        .hueco:first-child { grid-row: auto; grid-column: span 2; min-height: 200px; }
+    }
+
+    .sub-cabeza {
+        margin-top: 64px; margin-bottom: -18px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11px; letter-spacing: 0.2em; text-transform: uppercase;
+        color: var(--text-muted);
+    }
+
+    /* --- servicios: cada persona, contada por lo que hace por tu disco --- */
+    .capacidades { display: grid; grid-template-columns: repeat(auto-fit, minmax(205px, 1fr)); gap: 1px; margin-top: 54px; background: var(--line); border: 1px solid var(--line); }
+    .cap { background: var(--bg); padding: 0 0 24px; }
+    .cap-foto { aspect-ratio: 4 / 5; overflow: hidden; background: var(--bg-soft, #1d100e); }
+    .cap-foto img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.05); transition: filter 0.45s ease, transform 0.7s ease; }
+    .cap:hover .cap-foto img { filter: grayscale(0); transform: scale(1.04); }
+    .cap-txt { padding: 20px 22px 0; }
+    .cap h4 { font-size: 19px; font-weight: 800; letter-spacing: -0.01em; }
+    .cap .rol { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent); margin-top: 7px; }
+    .cap .hace { margin-top: 13px; font-size: 14.5px; line-height: 1.6; color: var(--text-muted); }
+
+
+    /* --- sello: el roster, presentado en forma --- */
+    .roster { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin-top: 54px; background: var(--line); border: 1px solid var(--line); }
+    .art { position: relative; display: block; background: var(--bg); text-decoration: none; color: inherit; }
+    .art-foto { position: relative; aspect-ratio: 1 / 1; overflow: hidden; }
+    .art-foto img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.05); transition: filter 0.45s ease, transform 0.7s ease; }
+    .art:hover .art-foto img { filter: grayscale(0); transform: scale(1.05); }
+    .art-txt { padding: 16px 18px 22px; }
+    .art h4 { font-size: 17px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.01em; }
+    .art .gen { font-family: 'JetBrains Mono', monospace; font-size: 9.5px; letter-spacing: 0.13em; text-transform: uppercase; color: var(--text-muted); margin-top: 7px; }
+
+    /* video en hover, igual que en la pagina publicada: se apila sobre la foto
+       y las fuentes se cargan recien al pasar el mouse */
+    .art-video {
+        display: none;
+        position: absolute; inset: 0;
+        width: 100%; height: 100%;
+        object-fit: cover;
+        opacity: 0;
+        pointer-events: none;
+        filter: grayscale(1) contrast(1.05);
+        transition: opacity 0.45s ease, filter 0.4s ease, transform 0.7s ease;
+    }
+    @media (hover: hover) and (pointer: fine) {
+        .art-video { display: block; }
+        .art:hover .art-video { opacity: 1; filter: grayscale(0) contrast(1.05); transform: scale(1.05); }
+    }
+    @media (prefers-reduced-motion: reduce) { .art-video { display: none; } }
+
+    .art-links { display: flex; gap: 12px; margin-top: 13px; }
+    .art-links a { display: inline-flex; opacity: 0.5; transition: opacity 0.25s ease; }
+    .art-links a:hover { opacity: 1; }
+    .art-links svg { width: 16px; height: 16px; fill: var(--text); }
+
+    /* --- escucha: la playlist del sello --- */
+    .escucha { margin-top: 72px; padding-top: 54px; border-top: 1px solid var(--line); }
+    .escucha h3 { font-size: clamp(26px, 3.6vw, 44px); font-weight: 900; text-transform: uppercase; letter-spacing: -0.03em; }
+    .escucha p { margin-top: 10px; color: var(--text-muted); font-size: 15px; }
+    .escucha .dale-play {
+        display: inline-flex; align-items: center; gap: 9px; margin-top: 20px;
+        font-family: 'JetBrains Mono', monospace;
+        font-size: 11.5px; letter-spacing: 0.18em; text-transform: uppercase;
+        color: var(--accent);
+    }
+    .escucha .dale-play svg { width: 18px; height: 18px; fill: var(--accent); }
+    .escucha .marco {
+        margin-top: 24px;
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        overflow: hidden;
+        box-shadow: 0 30px 80px rgba(0,0,0,0.5);
+    }
+    .escucha iframe { display: block; width: 100%; height: 520px; border: 0; }
+    @media (max-width: 620px) { .escucha iframe { height: 420px; } }
+
+    .para-que { margin-top: 52px; display: flex; flex-wrap: wrap; gap: 10px; }
+    .para-que span {
+        border: 1px solid var(--line); padding: 9px 15px;
+        font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+        letter-spacing: 0.14em; text-transform: uppercase; color: var(--text-muted);
+    }
+
+    /* el roster va de a 4; en pantallas medianas 2 y en telefono 1 */
+    @media (max-width: 1040px) { .roster { grid-template-columns: repeat(2, 1fr); } }
+    @media (max-width: 520px)  { .roster { grid-template-columns: 1fr; } }
+
+    .art, .cap { cursor: pointer; }
+
+    /* ---------- pop-up de artista / integrante ---------- */
+    /* Va de margen a margen, como en la pagina original: la foto toma la
+       izquierda y la bio la derecha, sin caja flotando en el medio. */
+    .modal {
+        position: fixed; inset: 0; z-index: 80;
+        display: none; align-items: center; justify-content: center;
+        padding: 0;
+    }
+    .modal.abierto { display: flex; }
+    .modal-fondo { position: absolute; inset: 0; background: rgba(8,4,3,0.82); backdrop-filter: blur(6px); }
+    .modal-caja {
+        position: relative;
+        width: 100%;
+        height: min(84vh, 760px);
+        max-height: 94vh;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: minmax(0, 44%) minmax(0, 56%);
+        background: var(--bg);
+        border: none;
+        border-top: 1px solid var(--line);
+        border-bottom: 1px solid var(--line);
+        transform: translateY(28px);
+        opacity: 0;
+        transition: transform 0.45s cubic-bezier(.22,.61,.36,1), opacity 0.35s ease;
+        box-shadow: 0 -30px 90px rgba(0,0,0,0.45), 0 40px 120px rgba(0,0,0,0.6);
+    }
+    .modal.abierto .modal-caja { transform: translateY(0); opacity: 1; }
+
+    .modal-media { position: relative; overflow: hidden; background: var(--ink); }
+    /* Apaga el corte donde la foto se encuentra con la bio. */
+    .modal-media::after {
+        content: ''; position: absolute; inset: 0; pointer-events: none;
+        background: linear-gradient(90deg, rgba(20,11,9,0) 76%, rgba(20,11,9,0.55) 100%);
+    }
+    /* Los que son logotipo y no foto se muestran enteros: recortarlos a
+       apaisado les come el dibujo. */
+    .modal-media.entera img { object-fit: contain; padding: 22px; }
+    .modal-media img, .modal-media video { width: 100%; height: 100%; object-fit: cover; display: block; }
+    .modal-media video { position: absolute; inset: 0; opacity: 0; transition: opacity 0.6s ease; }
+    .modal-media video.visible { opacity: 1; }
+
+    .modal-cuerpo {
+        padding: clamp(34px, 4vw, 64px);
+        overflow-y: auto;
+        display: flex; flex-direction: column; justify-content: center;
+    }
+    .modal-cuerpo > * { max-width: 640px; }
+    .modal-cuerpo h3 { font-size: clamp(26px, 3.4vw, 40px); font-weight: 900; text-transform: uppercase; letter-spacing: -0.03em; line-height: 1; }
+    .modal-rol { margin-top: 10px; font-family: 'JetBrains Mono', monospace; font-size: 10.5px; letter-spacing: 0.15em; text-transform: uppercase; color: var(--accent); }
+    .modal-bio { margin-top: 20px; display: grid; gap: 13px; }
+    .modal-bio p { color: var(--text-muted); font-size: 15px; line-height: 1.7; }
+    .modal-links { margin-top: 24px; display: flex; gap: 14px; }
+    .modal-links a { display: inline-flex; opacity: 0.6; transition: opacity 0.25s ease; }
+    .modal-links a:hover { opacity: 1; }
+    .modal-links svg { width: 20px; height: 20px; fill: var(--text); }
+
+    .modal-cerrar {
+        position: absolute; top: 14px; right: 14px; z-index: 2;
+        width: 40px; height: 40px; border-radius: 999px;
+        border: 1px solid rgba(243,231,221,0.25);
+        background: rgba(12,6,5,0.6);
+        color: var(--text); font-size: 20px; line-height: 1;
+        cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+    }
+    .modal-cerrar:hover { background: rgba(12,6,5,0.9); }
+
+    /* Cuando no entran dos columnas, la foto pasa arriba y la bio abajo. */
+    @media (max-width: 900px) {
+        .modal-caja {
+            height: 100%; max-height: 100vh;
+            grid-template-columns: 1fr;
+            grid-template-rows: auto minmax(0, 1fr);
+            border: none;
+        }
+        .modal-media { aspect-ratio: 16 / 11; }
+        .modal-media::after { background: linear-gradient(180deg, rgba(20,11,9,0) 66%, rgba(20,11,9,0.65) 100%); }
+        .modal-cuerpo { padding: 28px 22px 40px; justify-content: flex-start; }
+    }
+    @media (max-width: 560px) { .modal-cuerpo { padding: 24px 22px 32px; } }
+
+    /* ---------- WhatsApp: dos caminos, uno por negocio ---------- */
+    .wa { position: fixed; right: 22px; bottom: 22px; z-index: 60; display: flex; flex-direction: column; align-items: flex-end; gap: 10px; }
+    .wa-btn {
+        width: 58px; height: 58px; border-radius: 999px; border: 0;
+        background: #1f9d5a; cursor: pointer;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 10px 30px rgba(0,0,0,0.45);
+        transition: background 0.25s ease, transform 0.3s cubic-bezier(.22,.61,.36,1);
+    }
+    .wa-btn svg { width: 28px; height: 28px; fill: #fff; }
+    .wa:hover .wa-btn, .wa.abierto .wa-btn { background: #23b869; transform: scale(1.05); }
+
+    .wa-ops { display: flex; flex-direction: column; align-items: flex-end; gap: 8px; }
+    .wa-op {
+        display: block;
+        padding: 12px 18px;
+        border-radius: 999px;
+        background: #1f9d5a;
+        border: 1px solid #1f9d5a;
+        color: #fff;
+        font-family: 'Archivo', sans-serif;
+        font-size: 13.5px; font-weight: 700;
+        text-decoration: none; white-space: nowrap;
+        box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+        opacity: 0; transform: translateY(10px) scale(0.96);
+        pointer-events: none;
+        transition: opacity 0.3s ease, transform 0.35s cubic-bezier(.22,.61,.36,1), border-color 0.25s ease, background 0.25s ease;
+    }
+    .wa-op:nth-child(2) { transition-delay: 0.05s; }
+    .wa:hover .wa-op, .wa:focus-within .wa-op, .wa.abierto .wa-op {
+        opacity: 1; transform: translateY(0) scale(1); pointer-events: auto;
+    }
+    .wa-op:hover { background: #23b869; border-color: #23b869; color: #fff; }
+    /* el camino que corresponde a la seccion que se esta leyendo queda marcado */
+    .wa-op.activo { border-color: var(--text); box-shadow: 0 8px 24px rgba(0,0,0,0.4), 0 0 0 2px rgba(243,231,221,0.35); }
+
+    @media (max-width: 560px) {
+        .wa { right: 14px; bottom: 14px; }
+        .wa-op { font-size: 12.5px; padding: 10px 15px; }
+    }
+
+    /* ---------- paquetes ---------- */
+    .paquetes { margin-top: 22px; display: grid; grid-template-columns: repeat(auto-fit, minmax(258px, 1fr)); gap: 14px; }
+    .paq { border: 1px solid var(--line); padding: 26px 24px 28px; display: flex; flex-direction: column; }
+    .paq .n { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--accent); }
+    .paq h5 { margin-top: 12px; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.015em; }
+    .paq .qué { margin-top: 10px; font-size: 14px; line-height: 1.6; color: var(--text-muted); }
+    .paq ul { margin-top: 18px; padding: 0; list-style: none; display: grid; gap: 8px; }
+    .paq li {
+        font-size: 13.5px; line-height: 1.5; color: var(--text-muted);
+        padding-left: 16px; position: relative;
+    }
+    .paq li::before { content: ''; position: absolute; left: 0; top: 8px; width: 6px; height: 1px; background: var(--accent); }
+    .paq .precio {
+        margin-top: auto; padding-top: 20px;
+        font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
+        letter-spacing: 0.14em; text-transform: uppercase; color: rgba(243,231,221,0.4);
+    }
+</style>
+</head>
+<body>
+
+<main class="split" id="split">
+
+    <a class="half half-servicios" href="#paquetes" data-lado="servicios" aria-label="Servicios de estudio">
+        <div class="half-bg">
+            <video class="half-video" muted loop playsinline preload="none" aria-hidden="true"
+                   data-webm="assets/portada-servicios.webm" data-mp4="assets/portada-servicios.mp4"></video>
+        </div>
+        <div class="half-label">
+            <h2>Servicios</h2>
+            <p>Grabá tu disco en el estudio. Producción, filmación, mezcla y máster.</p>
+            <span class="entrar">Ver paquetes <span class="flecha">→</span></span>
+        </div>
+    </a>
+
+    <a class="half half-sello" href="#sello" data-lado="sello" aria-label="El sello y su roster">
+        <div class="half-bg">
+            <video class="half-video" muted loop playsinline preload="none" aria-hidden="true"
+                   data-webm="assets/portada-sello.webm" data-mp4="assets/portada-sello.mp4"></video>
+        </div>
+        <div class="half-label">
+            <h2>Sello</h2>
+            <p>Nuestros artistas en vivo. Festivales, ciclos y eventos.</p>
+            <span class="entrar">Ver el roster <span class="flecha">→</span></span>
+        </div>
+    </a>
+
+    <div class="divider"></div>
+
+    <div class="marca"><img src="assets/logo-light.png" alt="Reina Prisma"></div>
+    <div class="pie">Elegí por dónde entrar</div>
+
+</main>
+
+<section class="seccion" id="servicios" data-wa="servicios">
+    <div class="seccion-inner">
+        <div class="cabeza"><span class="idx">01</span><span class="bar"></span><span>Quiénes somos</span></div>
+        <h2>Servicios</h2>
+        <p class="entrada">
+            Somos cuatro personas y un estudio. Cada uno resuelve una parte distinta de un disco,
+            y podés contratarnos por lo que necesites: <strong>venir a grabar entero</strong>, o
+            sumar a alguno para que te resuelva lo que a vos te falta.
+        </p>
+
+        <!-- Reservado para las fotos del estudio. Al reemplazar los .hueco por
+             <img>, la grilla queda tal cual: la primera es la grande. -->
+        <div class="estudio">
+            <div class="estudio-grilla">
+                <div class="hueco"><span>Foto del estudio<br>— sala principal —</span></div>
+                <div class="hueco"><span>Control</span></div>
+                <div class="hueco"><span>Equipamiento</span></div>
+                <div class="hueco"><span>Sala de grabación</span></div>
+                <div class="hueco"><span>Detalle</span></div>
+            </div>
+            <div class="estudio-nota">Pendiente: fotos del lugar</div>
+        </div>
+
+        <div class="sub-cabeza">El equipo</div>
+
+        <div class="capacidades" id="equipo"></div>
+
+        <div class="sub-cabeza" id="paquetes">Paquetes</div>
+        <p class="entrada" style="margin-top:20px">
+            Cuatro formas de trabajar con nosotros. Se combinan: podés traer el disco
+            grabado y usar solo mezcla, o hacer todo el camino de punta a punta.
+        </p>
+
+        <div class="paquetes">
+            <div class="paq">
+                <div class="n">01</div>
+                <h5>Grabación</h5>
+                <p class="qué">Sesiones en el estudio, con los músicos que necesites de nuestro lado.</p>
+                <ul>
+                    <li>Sala y equipamiento</li>
+                    <li>Técnico de grabación</li>
+                    <li>Músicos de sesión a pedido</li>
+                    <li>Edición y comping</li>
+                </ul>
+                <div class="precio">Consultar por día o por canción</div>
+            </div>
+            <div class="paq">
+                <div class="n">02</div>
+                <h5>Mezcla y máster</h5>
+                <p class="qué">Traés lo grabado y te lo dejamos listo para plataformas.</p>
+                <ul>
+                    <li>Mezcla con revisiones</li>
+                    <li>Mastering para streaming</li>
+                    <li>Versión instrumental y a capela</li>
+                    <li>Entrega en los formatos que pidan las plataformas</li>
+                </ul>
+                <div class="precio">Consultar por canción</div>
+            </div>
+            <div class="paq">
+                <div class="n">03</div>
+                <h5>Filmación</h5>
+                <p class="qué">Registro audiovisual de las sesiones, para que el disco tenga con qué mostrarse.</p>
+                <ul>
+                    <li>Registro de la sesión en varias cámaras</li>
+                    <li>Video por canción</li>
+                    <li>Cortes verticales para redes</li>
+                    <li>Fotos del proceso</li>
+                </ul>
+                <div class="precio">Consultar por jornada</div>
+            </div>
+            <div class="paq">
+                <div class="n">04</div>
+                <h5>Disco completo</h5>
+                <p class="qué">De la primera maqueta a la tapa terminada, todo bajo el mismo techo.</p>
+                <ul>
+                    <li>Preproducción y arreglos</li>
+                    <li>Grabación, mezcla y máster</li>
+                    <li>Arte de tapa y sistema gráfico</li>
+                    <li>Material audiovisual del proceso</li>
+                </ul>
+                <div class="precio">Presupuesto a medida</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="seccion" id="sello" data-wa="sello">
+    <div class="seccion-inner">
+        <div class="cabeza"><span class="idx">02</span><span class="bar"></span><span>El plantel</span></div>
+        <h2>Sello</h2>
+        <p class="entrada">
+            Los artistas que están adentro de Reina Prisma. Podés escucharlos, y también
+            <strong>contratarlos para tocar</strong>: cada proyecto funciona en un tipo de
+            escenario distinto y te ayudamos a elegir cuál va con tu evento.
+        </p>
+
+        <div class="roster" id="roster"></div>
+
+        <div class="para-que">
+            <span>Festivales</span><span>Ciclos</span><span>Casamientos</span>
+            <span>Fiestas privadas</span><span>Eventos de marca</span><span>Bares y clubes</span>
+        </div>
+
+        <div class="escucha">
+            <h3>Escuchá</h3>
+            <p>La playlist del sello. Subí el volumen.</p>
+            <span class="dale-play">
+                <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7z"/></svg>
+                Dale play
+            </span>
+            <div class="marco">
+                <iframe src="https://open.spotify.com/embed/playlist/6BV6DlalFUzXOTPQQYncts?utm_source=generator&amp;theme=0"
+                        allow="autoplay; clipboard-write; encrypted-media; fullscreen; picture-in-picture"
+                        allowfullscreen
+                        title="Playlist Reina Prisma en Spotify"></iframe>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="wa" id="wa">
+    <div class="wa-ops">
+        <a class="wa-op" data-lado="servicios" target="_blank" rel="noopener"
+           href="https://wa.me/5491126517698?text=%C2%A1Hola%20Reina%20Prisma!%20Quiero%20grabar%20en%20el%20estudio.">
+            Quiero grabar en el estudio
+        </a>
+        <a class="wa-op" data-lado="sello" target="_blank" rel="noopener"
+           href="https://wa.me/5491130243285?text=%C2%A1Hola%20Reina%20Prisma!%20Quiero%20contratar%20a%20un%20artista%20para%20tocar.">
+            Quiero contratar un artista
+        </a>
+    </div>
+    <button class="wa-btn" type="button" aria-label="Contacto por WhatsApp" aria-expanded="false">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M12.04 2c-5.46 0-9.91 4.45-9.91 9.91 0 1.75.46 3.45 1.32 4.95L2.05 22l5.25-1.38c1.45.79 3.08 1.21 4.74 1.21h.01c5.46 0 9.91-4.45 9.91-9.91 0-2.65-1.03-5.14-2.9-7.01A9.82 9.82 0 0 0 12.04 2zm0 1.67c2.2 0 4.27.86 5.82 2.42a8.18 8.18 0 0 1 2.42 5.83c0 4.54-3.7 8.24-8.25 8.24-1.48 0-2.93-.4-4.2-1.15l-.3-.18-3.12.82.83-3.04-.2-.31a8.2 8.2 0 0 1-1.26-4.38c0-4.54 3.7-8.24 8.26-8.24zm-2.84 4.43c-.13 0-.35.05-.53.25-.18.2-.7.69-.7 1.67 0 .99.72 1.94.82 2.07.1.13 1.4 2.14 3.4 3 .47.21.84.33 1.13.42.47.15.9.13 1.24.08.38-.06 1.17-.48 1.33-.94.16-.46.16-.86.12-.94-.05-.08-.18-.13-.38-.23-.2-.1-1.17-.58-1.35-.64-.18-.07-.32-.1-.45.1-.13.2-.51.64-.63.77-.12.13-.23.15-.43.05-.2-.1-.84-.31-1.6-.99-.59-.53-.99-1.18-1.11-1.38-.12-.2-.01-.31.09-.41.09-.09.2-.23.3-.35.1-.12.13-.2.2-.34.07-.13.03-.25-.02-.35-.05-.1-.44-1.08-.62-1.48-.16-.39-.32-.33-.44-.34l-.38-.01z"/>
+        </svg>
+    </button>
+</div>
+
+<div class="modal" id="modal" role="dialog" aria-modal="true">
+    <div class="modal-fondo" data-cerrar></div>
+    <div class="modal-caja">
+        <button class="modal-cerrar" type="button" data-cerrar aria-label="Cerrar">&times;</button>
+        <div class="modal-media" id="modal-media"></div>
+        <div class="modal-cuerpo">
+            <h3 id="modal-nombre"></h3>
+            <div class="modal-rol" id="modal-rol"></div>
+            <div class="modal-bio" id="modal-bio"></div>
+            <div class="modal-links" id="modal-links"></div>
+        </div>
+    </div>
+</div>
+
+<script src="datos.js"></script>
+<script>
+    /* El estado vive en el contenedor y no en cada mitad, porque las dos
+       animaciones tienen que dispararse juntas: cuando una crece, la otra cede. */
+    (function () {
+        var split = document.getElementById('split');
+        var mitades = split.querySelectorAll('.half');
+
+        /* Los dos caminos estan siempre a la vista. Lo unico que cambia es
+           cual queda marcado segun lo que se este mirando. */
+        var waOps = document.querySelectorAll('.wa-op');
+
+        var ladoHover = null;   /* el que estas señalando en la portada */
+        var ladoScroll = null;  /* el de la seccion que estas leyendo */
+
+        function aplicarWa() {
+            var actual = ladoHover || ladoScroll;
+            Array.prototype.forEach.call(waOps, function (o) {
+                o.classList.toggle('activo', !!actual && o.getAttribute('data-lado') === actual);
+            });
+        }
+
+        /* Los videos de la portada: fuentes recien en el primer hover, igual
+           que en el roster, para no descargar 2 MB de entrada. */
+        function prepararVideo(v) {
+            if (v.dataset.listo) return;
+            v.dataset.listo = '1';
+            [['webm', 'video/webm'], ['mp4', 'video/mp4']].forEach(function (f) {
+                var s = document.createElement('source');
+                s.src = v.getAttribute('data-' + f[0]);
+                s.type = f[1];
+                v.appendChild(s);
+            });
+            v.load();
+        }
+
+        function marcar(lado) {
+            ladoHover = lado;
+            if (lado) { split.setAttribute('data-hover', lado); }
+            else { split.removeAttribute('data-hover'); }
+
+            Array.prototype.forEach.call(split.querySelectorAll('.half'), function (m) {
+                var v = m.querySelector('.half-video');
+                if (!v) return;
+                if (m.getAttribute('data-lado') === lado) {
+                    prepararVideo(v);
+                    var p = v.play();
+                    if (p && p.catch) p.catch(function () {});
+                } else {
+                    v.pause();
+                }
+            });
+
+            aplicarWa();
+        }
+
+        /* Al bajar, el boton adopta el lado de la seccion que ocupa la pantalla.
+           El hover de la portada tiene prioridad mientras exista. */
+        if ('IntersectionObserver' in window) {
+            var obs = new IntersectionObserver(function (entradas) {
+                entradas.forEach(function (e) {
+                    if (e.isIntersecting) {
+                        ladoScroll = e.target.getAttribute('data-wa');
+                        aplicarWa();
+                    }
+                });
+            }, { rootMargin: '-45% 0px -45% 0px' });
+            Array.prototype.forEach.call(document.querySelectorAll('[data-wa]'), function (s) { obs.observe(s); });
+        }
+
+        Array.prototype.forEach.call(mitades, function (m) {
+            var lado = m.getAttribute('data-lado');
+            m.addEventListener('mouseenter', function () { marcar(lado); });
+            m.addEventListener('focus', function () { marcar(lado); });
+            m.addEventListener('mouseleave', function () { marcar(null); });
+            m.addEventListener('blur', function () { marcar(null); });
+        });
+    })();
+
+/* ============ ROSTER, EQUIPO Y POP-UP ============ */
+(function () {
+    var RAIZ = '';   /* datos.js trae rutas desde la raiz del sitio */
+
+    var ICONO = {
+        spotify: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm4.59 14.43a.62.62 0 0 1-.86.21c-2.35-1.44-5.3-1.76-8.79-.96a.62.62 0 1 1-.28-1.21c3.8-.87 7.07-.5 9.71 1.11.3.18.39.57.22.85zm1.22-2.72a.78.78 0 0 1-1.07.26c-2.69-1.65-6.79-2.13-9.97-1.17a.78.78 0 1 1-.45-1.49c3.63-1.1 8.15-.56 11.24 1.34.36.22.48.7.25 1.06zm.1-2.83C14.7 8.96 9.5 8.79 6.42 9.72a.93.93 0 1 1-.54-1.79c3.54-1.07 9.28-.86 12.94 1.31a.93.93 0 1 1-.95 1.6z"/></svg>',
+        youtube: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M23.5 6.2a3 3 0 0 0-2.1-2.1C19.5 3.5 12 3.5 12 3.5s-7.5 0-9.4.6A3 3 0 0 0 .5 6.2 31 31 0 0 0 0 12a31 31 0 0 0 .5 5.8 3 3 0 0 0 2.1 2.1c1.9.6 9.4.6 9.4.6s7.5 0 9.4-.6a3 3 0 0 0 2.1-2.1A31 31 0 0 0 24 12a31 31 0 0 0-.5-5.8zM9.5 15.6V8.4l6.3 3.6-6.3 3.6z"/></svg>',
+        instagram: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.16c3.2 0 3.58.01 4.85.07 1.17.05 1.8.25 2.23.41.56.22.96.48 1.38.9.42.42.68.82.9 1.38.16.42.36 1.06.41 2.23.06 1.27.07 1.65.07 4.85s-.01 3.58-.07 4.85c-.05 1.17-.25 1.8-.41 2.23-.22.56-.48.96-.9 1.38-.42.42-.82.68-1.38.9-.42.16-1.06.36-2.23.41-1.27.06-1.65.07-4.85.07s-3.58-.01-4.85-.07c-1.17-.05-1.8-.25-2.23-.41a3.7 3.7 0 0 1-1.38-.9 3.7 3.7 0 0 1-.9-1.38c-.16-.42-.36-1.06-.41-2.23C2.17 15.58 2.16 15.2 2.16 12s.01-3.58.07-4.85c.05-1.17.25-1.8.41-2.23.22-.56.48-.96.9-1.38.42-.42.82-.68 1.38-.9.42-.16 1.06-.36 2.23-.41C8.42 2.17 8.8 2.16 12 2.16zm0 4.38a5.3 5.3 0 1 1 0 10.6 5.3 5.3 0 0 1 0-10.6zm0 1.62a3.68 3.68 0 1 0 0 7.36 3.68 3.68 0 0 0 0-7.36zm5.48-2.9a1.24 1.24 0 1 1 0 2.48 1.24 1.24 0 0 1 0-2.48z"/></svg>',
+        web: '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20zm6.9 6h-2.6a15 15 0 0 0-1.3-3.4A8 8 0 0 1 18.9 8zM12 4.1c.7 1 1.3 2.3 1.7 3.9h-3.4c.4-1.6 1-2.9 1.7-3.9zM4.3 14a8 8 0 0 1 0-4h3a17 17 0 0 0 0 4zm.8 2h2.6c.3 1.2.7 2.4 1.3 3.4A8 8 0 0 1 5.1 16zm2.6-8H5.1a8 8 0 0 1 3.9-3.4C8.4 5.6 8 6.8 7.7 8zM12 19.9c-.7-1-1.3-2.3-1.7-3.9h3.4c-.4 1.6-1 2.9-1.7 3.9zm2.1-5.9H9.9a15 15 0 0 1 0-4h4.2a15 15 0 0 1 0 4zm.8 5.4c.6-1 1-2.2 1.3-3.4h2.6a8 8 0 0 1-3.9 3.4zm1.7-5.4a17 17 0 0 0 0-4h3a8 8 0 0 1 0 4z"/></svg>'
+    };
+
+    /* Lo que cada integrante resuelve de tu disco. La bio larga queda para el
+       pop-up; esto es la version vendible. */
+    var HACE = {
+        'p-lanzo':   'Te graba. Y cuando el disco esta tocado, lo mezcla y lo deja masterizado, listo para subir a plataformas.',
+        'p-gonzalo': 'Si te falta un instrumento, lo toca. Guitarras, arreglos, produccion y edicion, con 25 anos de oficio y sin casarse con ningun genero.',
+        'p-lukitas': 'Te hace la bateria. Le busca el pulso a la cancion y ordena las etapas para que la grabacion no se empantane.',
+        'p-felipe':  'Te hace la tapa. Y el sistema completo del lanzamiento: etiqueta, funda, booklet y material para redes.',
+        'p-jxan':    'Te resuelve el vivo. Playback, afinacion vocal y sistemas de show, ademas de mezcla y mastering.'
+    };
+
+    /* Donde cae la cara en cada foto. Sin esto, el recorte apaisado del
+       pop-up muestra ropa en vez de cara en varios casos. */
+    var ENCUADRE = {
+        'p-lanzo': '50% 34%', 'p-gonzalo': '50% 22%', 'p-felipe': '50% 24%',
+        'p-lukitas': '50% 30%', 'p-jxan': '50% 30%',
+        'jjjulian': '50% 26%', 'cocolero': '50% 28%', 'lanzo': '50% 34%',
+        'ju': '50% 26%', 'chicoscrema': '50% 32%'
+    };
+    /* Estos no son fotos sino logotipos: se muestran enteros, sin recortar. */
+    var ENTERAS = { daefuq: 1, ayanday: 1, ladyboys: 1 };
+
+    function encuadre(id) {
+        return ENCUADRE[id] ? ' style="object-position:' + ENCUADRE[id] + '"' : '';
+    }
+
+    var POR_ID = {};
+
+    function linksHTML(l, clase) {
+        var out = '';
+        Object.keys(l || {}).forEach(function (k) {
+            if (!ICONO[k]) return;
+            out += '<a href="' + l[k] + '" target="_blank" rel="noopener" aria-label="' + k + '">' + ICONO[k] + '</a>';
+        });
+        return out ? '<div class="' + clase + '">' + out + '</div>' : '';
+    }
+
+    function videoHTML(id, clase) {
+        var v = VIDEOS[id];
+        if (!v) return '';
+        return '<video class="' + clase + '" muted loop playsinline preload="none" aria-hidden="true"' +
+               ' data-webm="' + RAIZ + v + '.webm" data-mp4="' + RAIZ + v + '.mp4"></video>';
+    }
+
+    /* ---------- roster ---------- */
+    var htmlR = '';
+    ARTISTS.forEach(function (a) {
+        POR_ID[a.id] = a;
+        htmlR += '<div class="art" data-id="' + a.id + '" role="button" tabindex="0">' +
+                    '<div class="art-foto">' +
+                        '<img src="' + RAIZ + a.photo + '" alt="' + a.name + '" loading="lazy"' + encuadre(a.id) + '>' +
+                        videoHTML(a.id, 'art-video') +
+                    '</div>' +
+                    '<div class="art-txt"><h4>' + a.name + '</h4>' +
+                        '<div class="gen">' + (a.genre || '') + '</div>' +
+                        linksHTML(a.links, 'art-links') +
+                    '</div>' +
+                 '</div>';
+    });
+    document.getElementById('roster').innerHTML = htmlR;
+
+    /* ---------- equipo ---------- */
+    var htmlE = '';
+    TEAM.forEach(function (p) {
+        POR_ID[p.id] = p;
+        htmlE += '<div class="cap" data-id="' + p.id + '" role="button" tabindex="0">' +
+                    '<div class="cap-foto"><img src="' + RAIZ + p.photo + '" alt="' + p.name + '" loading="lazy"' + encuadre(p.id) + '></div>' +
+                    '<div class="cap-txt">' +
+                        '<h4>' + p.name + '</h4>' +
+                        '<div class="rol">' + (p.role || '') + '</div>' +
+                        '<p class="hace">' + (HACE[p.id] || p.tagline || '') + '</p>' +
+                    '</div>' +
+                 '</div>';
+    });
+    document.getElementById('equipo').innerHTML = htmlE;
+
+    /* ---------- carga diferida de los videos del roster ---------- */
+    function preparar(v) {
+        if (!v || v.dataset.listo) return;
+        v.dataset.listo = '1';
+        [['webm', 'video/webm'], ['mp4', 'video/mp4']].forEach(function (f) {
+            var so = document.createElement('source');
+            so.src = v.getAttribute('data-' + f[0]);
+            so.type = f[1];
+            v.appendChild(so);
+        });
+        v.load();
+    }
+
+    var puedeHover = window.matchMedia &&
+        window.matchMedia('(hover: hover) and (pointer: fine)').matches &&
+        !window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+    if (puedeHover && 'IntersectionObserver' in window) {
+        /* Se cargan al entrar en pantalla y no al pasar el mouse: si esperaba
+           al hover, el primer paso no alcanzaba a mostrar nada. */
+        var obsV = new IntersectionObserver(function (es) {
+            es.forEach(function (e) {
+                if (e.isIntersecting) { preparar(e.target.querySelector('.art-video')); obsV.unobserve(e.target); }
+            });
+        }, { rootMargin: '250px' });
+        Array.prototype.forEach.call(document.querySelectorAll('.art'), function (t) { obsV.observe(t); });
+    }
+
+    if (puedeHover) {
+        Array.prototype.forEach.call(document.querySelectorAll('.art'), function (t) {
+            var v = t.querySelector('.art-video');
+            if (!v) return;
+            t.addEventListener('mouseenter', function () {
+                preparar(v);
+                var p = v.play();
+                if (p && p.catch) p.catch(function () {});
+            });
+            t.addEventListener('mouseleave', function () { v.pause(); v.currentTime = 0; });
+        });
+    }
+
+    /* ---------- pop-up ---------- */
+    var modal = document.getElementById('modal');
+    var mMedia = document.getElementById('modal-media');
+    var mNombre = document.getElementById('modal-nombre');
+    var mRol = document.getElementById('modal-rol');
+    var mBio = document.getElementById('modal-bio');
+    var mLinks = document.getElementById('modal-links');
+    var ultimoFoco = null;
+
+    function abrir(id) {
+        var d = POR_ID[id];
+        if (!d) return;
+        ultimoFoco = document.activeElement;
+
+        mNombre.textContent = d.name;
+        mRol.textContent = d.genre || d.role || '';
+        mBio.innerHTML = (d.bio || []).map(function (p) { return '<p>' + p + '</p>'; }).join('');
+        mLinks.innerHTML = linksHTML(d.links, 'links-internos').replace('class="links-internos"', '');
+
+        /* La imagen del pop-up tambien se anima cuando el artista tiene clip. */
+        var v = VIDEOS[id];
+        mMedia.className = 'modal-media' + (ENTERAS[id] ? ' entera' : '');
+        mMedia.innerHTML = '<img src="' + RAIZ + d.photo + '" alt="' + d.name + '"' + encuadre(id) + '>' +
+            (v ? '<video muted loop playsinline autoplay><source src="' + RAIZ + v + '.webm" type="video/webm"><source src="' + RAIZ + v + '.mp4" type="video/mp4"></video>' : '');
+        var mv = mMedia.querySelector('video');
+        if (mv) {
+            mv.addEventListener('playing', function () { mv.classList.add('visible'); });
+            var p = mv.play();
+            if (p && p.catch) p.catch(function () {});
+        }
+
+        modal.classList.add('abierto');
+        document.body.style.overflow = 'hidden';
+    }
+
+    function cerrar() {
+        modal.classList.remove('abierto');
+        document.body.style.overflow = '';
+        mMedia.innerHTML = '';   /* corta la descarga del video al cerrar */
+        if (ultimoFoco && ultimoFoco.focus) ultimoFoco.focus();
+    }
+
+    document.addEventListener('click', function (e) {
+        if (e.target.closest && e.target.closest('[data-cerrar]')) { cerrar(); return; }
+        if (e.target.closest && e.target.closest('.art-links a, .modal-links a')) return;  /* los links van a su destino */
+        var t = e.target.closest && e.target.closest('.art, .cap');
+        if (t) abrir(t.getAttribute('data-id'));
+    });
+    document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && modal.classList.contains('abierto')) cerrar();
+        if ((e.key === 'Enter' || e.key === ' ') && document.activeElement &&
+            document.activeElement.matches && document.activeElement.matches('.art, .cap')) {
+            e.preventDefault();
+            abrir(document.activeElement.getAttribute('data-id'));
+        }
+    });
+})();
+
+/* ============ PRECARGA DE LAS PORTADAS ============ */
+window.addEventListener('load', function () {
+    /* Son el centro de la pagina: si esperan al hover, el primer paso del
+       mouse no muestra nada mientras se descargan. */
+    Array.prototype.forEach.call(document.querySelectorAll('.half-video'), function (v) {
+        if (v.dataset.listo) return;
+        v.dataset.listo = '1';
+        [['webm', 'video/webm'], ['mp4', 'video/mp4']].forEach(function (f) {
+            var s = document.createElement('source');
+            s.src = v.getAttribute('data-' + f[0]);
+            s.type = f[1];
+            v.appendChild(s);
+        });
+        v.load();
+    });
+});
+</script>
+
+</body>
+</html>
