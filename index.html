@@ -28,6 +28,7 @@
 
     html, body {
         height: 100%;
+        overflow-x: hidden;
         background: var(--ink);
         color: var(--text);
         font-family: 'Archivo', sans-serif;
@@ -353,7 +354,7 @@
     }
 
     /* --- servicios: cada persona, contada por lo que hace por tu disco --- */
-    .capacidades { display: grid; grid-template-columns: repeat(auto-fit, minmax(205px, 1fr)); gap: 1px; margin-top: 54px; background: var(--line); border: 1px solid var(--line); }
+    .capacidades { display: grid; grid-template-columns: repeat(auto-fit, minmax(205px, 1fr)); gap: 1px; margin-top: 54px; background: var(--line); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
     .cap { background: var(--bg); padding: 0 0 24px; }
     .cap-foto { aspect-ratio: 4 / 5; overflow: hidden; background: var(--bg-soft, #1d100e); }
     .cap-foto img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.05); transition: filter 0.45s ease, transform 0.7s ease; }
@@ -365,7 +366,7 @@
 
 
     /* --- sello: el roster, presentado en forma --- */
-    .roster { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin-top: 54px; background: var(--line); border: 1px solid var(--line); }
+    .roster { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; margin-top: 54px; background: var(--line); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
     .art { position: relative; display: block; background: var(--bg); text-decoration: none; color: inherit; }
     .art-foto { position: relative; aspect-ratio: 1 / 1; overflow: hidden; }
     .art-foto img { width: 100%; height: 100%; object-fit: cover; display: block; filter: grayscale(1) contrast(1.05); transition: filter 0.45s ease, transform 0.7s ease; }
@@ -555,8 +556,8 @@
     }
 
     /* ---------- paquetes ---------- */
-    .paquetes { margin-top: 22px; display: grid; grid-template-columns: repeat(auto-fit, minmax(258px, 1fr)); gap: 14px; }
-    .paq { border: 1px solid var(--line); padding: 26px 24px 28px; display: flex; flex-direction: column; }
+    .paquetes { margin-top: 22px; display: grid; grid-template-columns: repeat(auto-fit, minmax(258px, 1fr)); gap: 1px; background: var(--line); border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+    .paq { background: var(--bg); padding: 34px 30px 36px; display: flex; flex-direction: column; }
     .paq .n { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 0.18em; color: var(--accent); }
     .paq h5 { margin-top: 12px; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.015em; }
     .paq .qué { margin-top: 10px; font-size: 14px; line-height: 1.6; color: var(--text-muted); }
@@ -570,6 +571,16 @@
         margin-top: auto; padding-top: 20px;
         font-family: 'JetBrains Mono', monospace; font-size: 10.5px;
         letter-spacing: 0.14em; text-transform: uppercase; color: rgba(243,231,221,0.4);
+    }
+
+    /* ---------- grillas a los margenes ----------
+       rompen el max-width de .seccion-inner y el padding lateral de .seccion
+       para llegar de borde a borde. Sin stroke en los costados: quedan unidas. */
+    .paquetes, .capacidades, .roster {
+        margin-left: calc(50% - 50vw);
+        margin-right: calc(50% - 50vw);
+        border-left: 0;
+        border-right: 0;
     }
 </style>
 </head>
