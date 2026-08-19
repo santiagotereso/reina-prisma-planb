@@ -38,14 +38,14 @@ var ARTISTS = [
                 links: {}
             },
             {
-                id: 'daefuq', name: 'DAEFUQ', genre: 'Fusión R&B · Jazz · Funk', photo: 'assets/daefuq.jpg',
+                id: 'daefuq', name: 'DAEFUQ', genre: 'Fusión R&B · Jazz · Funk', photo: 'assets/daefuq.jpg', video: 'assets/daefuq-hover',
                 tagline: 'Fusión R&B, groove y jazz experimental.',
                 bio: ['Daefuq es un proyecto de fusión R&B. Con composiciones originales, improvisación y mucho groove, construyen un sonido enérgico, sofisticado y profundamente bailable.',
                       'Cada concierto es una experiencia viva, donde la libertad del jazz experimental dialoga con la fuerza del funk y el calor de los ritmos latinoamericanos.'],
                 links: { spotify: 'https://open.spotify.com/intl-es/artist/2g61pWJbmY6GoliS4UiVy9', youtube: 'https://www.youtube.com/@daefuq', instagram: 'https://www.instagram.com/daefuq_' }
             },
             {
-                id: 'ayanday', name: 'Ayanday', genre: 'Reggae · Tributo a Bob Marley', photo: 'assets/ayanday.jpg',
+                id: 'ayanday', name: 'Ayanday', genre: 'Reggae · Tributo a Bob Marley', photo: 'assets/ayanday.jpg', video: 'assets/ayanday-hover',
                 tagline: 'El legado de Bob Marley con alma latinoamericana.',
                 bio: ['Ayanday rinde homenaje al legado de Bob Marley, llevando su música hacia nuevos paisajes sonoros. Sin perder la esencia del reggae ni la fuerza de su mensaje, incorporan ritmos latinoamericanos que expanden cada canción con nuevos colores, texturas y energía.',
                       'El resultado es un espectáculo vibrante, donde el espíritu de Marley se encuentra con la identidad musical de Latinoamérica, invitando al público a cantar, bailar y celebrar la música como un lenguaje universal.'],
@@ -111,4 +111,4 @@ var TEAM = [
             }
         ];
 
-var VIDEOS = {"jjjulian": "assets/jjjulian-hover", "cocolero": "assets/cocolero-hover", "lanzo": "assets/lanzo-hover", "ju": "assets/ju-hover"};
+var VIDEOS = {"jjjulian": "assets/jjjulian-hover", "cocolero": "assets/cocolero-hover", "lanzo": "assets/lanzo-hover", "ju": "assets/ju-hover", "daefuq": "assets/daefuq-hover", "ayanday": "assets/ayanday-hover"};
