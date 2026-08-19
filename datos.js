@@ -52,7 +52,7 @@ var ARTISTS = [
                 links: { instagram: 'https://www.instagram.com/ayanay.tributo' }
             },
             {
-                id: 'chicoscrema', name: 'Chicos Crema', genre: 'DJ Set · Groove · Disco · House', photo: 'assets/chicos-crema.jpg',
+                id: 'chicoscrema', name: 'Chicos Crema', genre: 'DJ Set · Groove · Disco · House', photo: 'assets/chicos-crema.jpg', video: 'assets/chicoscrema-hover',
                 tagline: 'Cultura del groove: soul, disco, funk y house.',
                 bio: ['Chicos Crema es un dúo de DJs, productores y coleccionistas musicales dedicado a celebrar la cultura del groove. Inspirados por el soul, el disco, el funk y el house, desarrollan sesiones que combinan investigación musical, criterio artístico y una lectura precisa de la pista.',
                       'Su sonido equilibra clásicos, joyas ocultas y producciones contemporáneas, construyendo una experiencia donde el ritmo, la elegancia y la energía conviven de forma natural.',
@@ -111,4 +111,4 @@ var TEAM = [
             }
         ];
 
-var VIDEOS = {"jjjulian": "assets/jjjulian-hover", "cocolero": "assets/cocolero-hover", "lanzo": "assets/lanzo-hover", "ju": "assets/ju-hover", "daefuq": "assets/daefuq-hover", "ayanday": "assets/ayanday-hover"};
+var VIDEOS = {"jjjulian": "assets/jjjulian-hover", "cocolero": "assets/cocolero-hover", "lanzo": "assets/lanzo-hover", "ju": "assets/ju-hover", "daefuq": "assets/daefuq-hover", "ayanday": "assets/ayanday-hover", "chicoscrema": "assets/chicoscrema-hover"};

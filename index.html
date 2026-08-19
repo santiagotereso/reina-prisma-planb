@@ -984,6 +984,9 @@
             t.addEventListener('mouseenter', function () {
                 preparar(v);
                 t.classList.add('mostrando');
+                /* Siempre desde el primer frame: si el puntero entra y sale
+                   rapido, el clip no queda arrancando por la mitad. */
+                try { v.currentTime = 0; } catch (e) {}
                 var p = v.play();
                 if (p && p.catch) p.catch(function () {});
             });
