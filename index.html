@@ -327,6 +327,8 @@
            La grilla es la misma que tenian los huecos: la primera manda y ocupa
            las dos filas de la izquierda. --- */
     .estudio { margin-top: 52px; }
+    /* cuando cuelga de un subtitulo, el aire lo pone el subtitulo */
+    .sub-cabeza + .estudio { margin-top: 22px; }
     .estudio-grilla { display: grid; grid-template-columns: 2fr 1fr 1fr; gap: 12px; }
     .foto-estudio { position: relative; overflow: hidden; background: rgba(243,231,221,0.03); }
     .foto-estudio img { width: 100%; height: 100%; object-fit: cover; display: block; }
@@ -658,18 +660,6 @@
             sumar a alguno para que te resuelva lo que a vos te falta.
         </p>
 
-        <!-- Imagenes del estudio que mando Santiago (renders, no fotos del lugar).
-             Recortadas a 16:9 desde 4:3, que es lo que pide la grilla. -->
-        <div class="estudio">
-            <div class="estudio-grilla">
-                <figure class="foto-estudio"><img src="assets/estudio-sala-grabacion.jpg" alt="La sala de grabación" loading="lazy"></figure>
-                <figure class="foto-estudio"><img src="assets/estudio-control.jpg" alt="El control" loading="lazy"></figure>
-                <figure class="foto-estudio"><img src="assets/estudio-living.jpg" alt="El living" loading="lazy"></figure>
-                <figure class="foto-estudio"><img src="assets/estudio-equipamiento.jpg" alt="El equipamiento" loading="lazy"></figure>
-                <figure class="foto-estudio"><img src="assets/estudio-detalle.jpg" alt="Un detalle del estudio" loading="lazy"></figure>
-            </div>
-        </div>
-
         <div class="sub-cabeza">El equipo</div>
 
         <div class="capacidades" id="equipo"></div>
@@ -728,6 +718,19 @@
                     <li>Material audiovisual del proceso</li>
                 </ul>
                 <div class="precio">Presupuesto a medida</div>
+            </div>
+        </div>
+
+        <div class="sub-cabeza">El estudio</div>
+        <!-- Imagenes del estudio que mando Santiago (renders, no fotos del lugar).
+             Recortadas a 16:9 desde 4:3, que es lo que pide la grilla. -->
+        <div class="estudio">
+            <div class="estudio-grilla">
+                <figure class="foto-estudio"><img src="assets/estudio-sala-grabacion.jpg" alt="La sala de grabación" loading="lazy"></figure>
+                <figure class="foto-estudio"><img src="assets/estudio-control.jpg" alt="El control" loading="lazy"></figure>
+                <figure class="foto-estudio"><img src="assets/estudio-living.jpg" alt="El living" loading="lazy"></figure>
+                <figure class="foto-estudio"><img src="assets/estudio-equipamiento.jpg" alt="El equipamiento" loading="lazy"></figure>
+                <figure class="foto-estudio"><img src="assets/estudio-detalle.jpg" alt="Un detalle del estudio" loading="lazy"></figure>
             </div>
         </div>
     </div>
