@@ -29,20 +29,20 @@ var ARTISTS = [
                 links: { spotify: 'https://open.spotify.com/intl-es/artist/2hEbHEKUghuVjyYtaQjxul', youtube: 'https://www.youtube.com/@lanzoivan', instagram: 'https://www.instagram.com/lanzoivan' }
             },
             {
-                id: 'ju', name: 'JU', genre: 'R&B', photo: 'assets/ju.jpg', video: 'assets/ju-hover',
+                id: 'ju', name: 'JU', genre: 'Cantante · R&B Soul', photo: 'assets/ju.jpg', video: 'assets/ju-hover',
                 tagline: 'Canta como si revelara un secreto al oído.',
                 bio: ['JU es una cantante de R&B de voz íntima, susurrada y profundamente envolvente. Su manera de cantar no busca imponerse, sino acercarse: cada frase parece dicha a pocos centímetros, con la calidez y la fragilidad de una confesión nocturna.',
                       'Canta como si revelara un secreto al oído, dejando que las palabras se deslicen entre melodías suaves, armonías delicadas y silencios que también forman parte de la música. En su voz conviven la sensualidad, la vulnerabilidad y una calma hipnótica que invita a escuchar con atención.',
                       'Su interpretación habita los pequeños gestos: una respiración, una nota apenas sostenida, una frase que se rompe suavemente antes de desaparecer. Con una sensibilidad capaz de volver enorme lo más pequeño, JU transforma emociones cotidianas en paisajes íntimos y profundos.',
                       'Su universo combina la elegancia del R&B contemporáneo con una atmósfera cálida, minimalista y nocturna. No necesita levantar la voz para dejar una marca: alcanza con una melodía cercana, un ritmo sutil y esa forma tan personal de cantar como si cada canción estuviera destinada a una sola persona.'],
-                links: {}
+                links: { instagram: 'https://www.instagram.com/_ju.si' }
             },
             {
                 id: 'daefuq', name: 'DAEFUQ', genre: 'Fusión R&B · Jazz · Funk', photo: 'assets/daefuq.jpg', video: 'assets/daefuq-hover',
                 tagline: 'Fusión R&B, groove y jazz experimental.',
                 bio: ['Daefuq es un proyecto de fusión R&B. Con composiciones originales, improvisación y mucho groove, construyen un sonido enérgico, sofisticado y profundamente bailable.',
                       'Cada concierto es una experiencia viva, donde la libertad del jazz experimental dialoga con la fuerza del funk y el calor de los ritmos latinoamericanos.'],
-                links: { spotify: 'https://open.spotify.com/intl-es/artist/2g61pWJbmY6GoliS4UiVy9', youtube: 'https://www.youtube.com/@daefuq', instagram: 'https://www.instagram.com/daefuq_' }
+                links: { instagram: 'https://www.instagram.com/daefuq_' }
             },
             {
                 id: 'ayanday', name: 'Ayanday', genre: 'Reggae · Tributo a Bob Marley', photo: 'assets/ayanday.jpg', video: 'assets/ayanday-hover',
@@ -96,9 +96,9 @@ var TEAM = [
                 links: { instagram: 'https://www.instagram.com/felipe.gonzaelez' }
             },
             {
-                id: 'p-lukitas', name: 'Lukitas Viotti', role: 'Asistente de Producción · Drum Doctor', photo: 'assets/lukitas.jpg',
+                id: 'p-lukitas', name: 'Lukitas Viotti', role: 'Drum Doctor', photo: 'assets/lukitas.jpg',
                 tagline: 'Le busca el pulso a cada canción.',
-                bio: ['Lukitas Viotti forma parte del equipo de Reina Prisma como asistente de producción y drum doctor. Desde su rol, acompaña la organización y el desarrollo de cada proyecto, colaborando tanto en la coordinación de las distintas etapas de producción como en el trabajo específico sobre baterías y percusión.',
+                bio: ['Lukitas Viotti forma parte del equipo de Reina Prisma como drum doctor. Desde su rol, acompaña el desarrollo de cada proyecto con el trabajo específico sobre baterías y percusión.',
                       'Su mirada combina precisión técnica, sensibilidad musical y una atención especial al sonido, la interpretación y los detalles que hacen que cada canción encuentre su pulso y su identidad.'],
                 links: { instagram: 'https://www.instagram.com/lukitasviotti' }
             },
@@ -107,7 +107,7 @@ var TEAM = [
                 tagline: 'Precisi\u00f3n t\u00e9cnica con sensibilidad musical.',
                 bio: ['jxanflorida es un ingeniero de sonido con experiencia en shows en vivo, sistemas de playback, afinaci\u00f3n vocal, mezcla y mastering. Actualmente trabaja como Playback Tech y Tune con artistas como Rusherking y Lit Killah, brindando soporte t\u00e9cnico y musical tanto en presentaciones en vivo como en entornos de gira.',
                       'Su trabajo combina precisi\u00f3n t\u00e9cnica con una fuerte sensibilidad musical, cubriendo desde la preparaci\u00f3n y operaci\u00f3n de sistemas para vivo hasta el procesamiento vocal, la mezcla y el mastering.'],
-                links: {}
+                links: { instagram: 'https://www.instagram.com/jxanflorida' }
             }
         ];
 
